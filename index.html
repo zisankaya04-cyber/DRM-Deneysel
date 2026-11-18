@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -25,13 +26,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 20px;
 }
 
 .container {
-    background: rgba(255,255,255,0.68);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-
+    background: rgba(255,255,255,0.93);
     width: 90%;
     max-width: 650px;
     padding: 35px;
@@ -48,15 +47,12 @@ h1 {
     font-size: 26px;
 }
 
-h2 {
-    font-size: 23px;
-}
-
-.word {
+#presentationWord,
+#testWord {
     font-size: 40px;
     font-weight: bold;
     margin: 65px 0;
-    min-height: 48px;
+    min-height: 50px;
 }
 
 button {
@@ -99,99 +95,47 @@ p {
     line-height: 1.7;
 }
 
+/* 30 SANİYELİK GERİ SAYIM */
 
-/* GERİ SAYIM TASARIMI */
-
-.waiting-text {
-    color: #444;
-    font-size: 16px;
-    margin-bottom: 25px;
-}
-
-.timer-ring {
-    width: 190px;
-    height: 190px;
-    border-radius: 50%;
+.timer-circle {
+    width: 150px;
+    height: 150px;
     margin: 25px auto;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background: conic-gradient(
-        #405b80 360deg,
-        rgba(64,91,128,0.15) 0deg
-    );
-
-    transition: background 0.5s ease;
+    position: relative;
 }
 
-.timer-inner {
-    width: 165px;
-    height: 165px;
-    border-radius: 50%;
-
-    background: rgba(255,255,255,0.88);
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.timer-circle svg {
+    width: 150px;
+    height: 150px;
+    transform: rotate(-90deg);
 }
 
-#countdown {
-    font-size: 58px;
+.timer-circle circle {
+    fill: none;
+    stroke-width: 10;
+}
+
+.timer-background {
+    stroke: #dddddd;
+}
+
+.timer-progress {
+    stroke: #405b80;
+    stroke-linecap: round;
+    stroke-dasharray: 408.4;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1s linear;
+}
+
+.timer-number {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 38px;
     font-weight: bold;
     color: #405b80;
-    line-height: 1.1;
 }
-
-.timer-inner span {
-    font-size: 14px;
-    color: #666;
-}
-
-.waiting-note {
-    font-size: 14px;
-    color: #555;
-    margin-top: 20px;
-}
-
-
-/* MOBİL */
-
-@media (max-width: 500px) {
-
-    .container {
-        padding: 25px 18px;
-    }
-
-    .word {
-        font-size: 32px;
-        margin: 45px 0;
-        min-height: 38px;
-    }
-
-    .timer-ring {
-        width: 165px;
-        height: 165px;
-    }
-
-    .timer-inner {
-        width: 143px;
-        height: 143px;
-    }
-
-    #countdown {
-        font-size: 48px;
-    }
-
-    button {
-        padding: 13px 20px;
-        font-size: 16px;
-    }
-}
-
 </style>
 </head>
 
@@ -212,7 +156,7 @@ p {
         </p>
 
         <p>
-            Her kelime kısa süre boyunca gösterilecektir.
+            Her kelime 1,2 saniye boyunca gösterilecektir.
             Her listenin ardından bir tanıma testi yapılacaktır.
         </p>
 
@@ -234,40 +178,49 @@ p {
 
         <h2 id="listNumber"></h2>
 
-        <div id="presentationWord" class="word"></div>
+        <div id="presentationWord"></div>
 
         <p id="presentationProgress"></p>
 
     </div>
 
 
-    <!-- BEKLEME EKRANI -->
+    <!-- 30 SANİYELİK BEKLEME -->
 
     <div id="waitingScreen" class="hidden">
 
-        <h2 id="waitingTitle">
-            Bir sonraki aşamaya hazırlanılıyor
-        </h2>
+        <h2>Lütfen bekleyiniz...</h2>
 
-        <p class="waiting-text" id="waitingText">
-            Lütfen bekleyiniz.
+        <p id="waitingMessage">
+            Bir sonraki aşama başlayacaktır.
         </p>
 
-        <div class="timer-ring" id="timerRing">
+        <div class="timer-circle">
 
-            <div class="timer-inner">
+            <svg viewBox="0 0 150 150">
 
-                <div id="countdown">30</div>
+                <circle
+                    class="timer-background"
+                    cx="75"
+                    cy="75"
+                    r="65">
+                </circle>
 
-                <span id="timerLabel">saniye</span>
+                <circle
+                    id="timerProgress"
+                    class="timer-progress"
+                    cx="75"
+                    cy="75"
+                    r="65">
+                </circle>
 
+            </svg>
+
+            <div id="timerNumber" class="timer-number">
+                30
             </div>
 
         </div>
-
-        <p class="waiting-note" id="waitingNote">
-            Lütfen bekleyiniz.
-        </p>
 
     </div>
 
@@ -282,7 +235,7 @@ p {
             Bu kelimeyi az önceki listede gördünüz mü?
         </p>
 
-        <div id="testWord" class="word"></div>
+        <div id="testWord"></div>
 
         <div id="choices">
 
@@ -338,6 +291,9 @@ const lists = [
 
 
 /* TANIMA TESTLERİ */
+
+/* true = Daha önce gösterildi
+   false = Daha önce gösterilmedi */
 
 const tests = [
 
@@ -399,13 +355,6 @@ const tests = [
 ];
 
 
-/* SÜRE AYARLARI */
-
-const WORD_DURATION = 1200;  // Kelime ekranda 1,2 saniye
-const TEST_WAIT = 30;        // Tanıma testi öncesi 30 saniye
-const LIST_WAIT = 3;         // Listeler arası 3 saniye
-
-
 /* DEĞİŞKENLER */
 
 let currentList = 0;
@@ -461,114 +410,29 @@ function startExperiment() {
 
 function showNextWord() {
 
-    /* Liste bittiyse 30 saniyelik beklemeye geç */
-
     if (currentWord >= lists[currentList].length) {
 
-        showScreen("waitingScreen");
+        /* TEST ARAYA BEKLEME KONMADAN BAŞLAR */
 
-        setWaitingScreen(
-            "Tanıma testine hazırlanılıyor",
-            "Lütfen bekleyiniz. Tanıma testi birazdan başlayacaktır.",
-            "Bu süre boyunca lütfen ekrana dokunmayınız.",
-            "saniye"
-        );
-
-        startCountdown(TEST_WAIT, startTest);
+        startTest();
 
         return;
 
     }
 
-
-    /* Liste numarası */
-
     document.getElementById("listNumber").textContent =
         "Liste " + (currentList + 1);
-
-
-    /* Kelime */
 
     document.getElementById("presentationWord").textContent =
         lists[currentList][currentWord];
 
-
-    /* İlerleme */
-
     document.getElementById("presentationProgress").textContent =
-        "Kelime " + (currentWord + 1) +
-        " / " + lists[currentList].length;
-
+        "Kelime " + (currentWord + 1) + " / " +
+        lists[currentList].length;
 
     currentWord++;
 
-
-    /* Kelime 1,2 saniye sonra değişir */
-
-    setTimeout(showNextWord, WORD_DURATION);
-
-}
-
-
-/* BEKLEME EKRANI YAZILARI */
-
-function setWaitingScreen(title, text, note, label) {
-
-    document.getElementById("waitingTitle").textContent = title;
-
-    document.getElementById("waitingText").textContent = text;
-
-    document.getElementById("waitingNote").textContent = note;
-
-    document.getElementById("timerLabel").textContent = label;
-
-}
-
-
-/* GERİ SAYIM */
-
-function startCountdown(seconds, callback) {
-
-    let remaining = seconds;
-
-    const countdown =
-        document.getElementById("countdown");
-
-    const ring =
-        document.getElementById("timerRing");
-
-
-    countdown.textContent = remaining;
-
-    ring.style.background =
-        "conic-gradient(#405b80 360deg, rgba(64,91,128,0.15) 0deg)";
-
-
-    const timer = setInterval(() => {
-
-        remaining--;
-
-        countdown.textContent = remaining;
-
-
-        const angle = (remaining / seconds) * 360;
-
-        ring.style.background =
-            `conic-gradient(
-                #405b80 ${angle}deg,
-                rgba(64,91,128,0.15) ${angle}deg
-            )`;
-
-
-        if (remaining <= 0) {
-
-            clearInterval(timer);
-
-            callback();
-
-        }
-
-    }, 1000);
+    setTimeout(showNextWord, 1200);
 
 }
 
@@ -581,6 +445,8 @@ function startTest() {
 
     currentTest = [...tests[currentList]];
 
+    /* TEST KELİMELERİNİ KARIŞTIR */
+
     currentTest.sort(() => Math.random() - 0.5);
 
     currentTestIndex = 0;
@@ -590,7 +456,7 @@ function startTest() {
 }
 
 
-/* TEST KELİMESİ */
+/* TEST KELİMESİNİ GÖSTER */
 
 function showTestWord() {
 
@@ -629,7 +495,6 @@ function answer(response) {
 
     const isCorrect = response === correctAnswer;
 
-
     results.push({
 
         participant: participantCode,
@@ -648,7 +513,6 @@ function answer(response) {
 
     });
 
-
     currentTestIndex++;
 
     showTestWord();
@@ -662,39 +526,79 @@ function finishList() {
 
     currentList++;
 
-
-    /* Bütün listeler bitti */
+    /* HER TESTTEN SONRA 30 SANİYE BEKLE */
 
     if (currentList >= lists.length) {
 
-        showScreen("endScreen");
+        startCountdown("Deney tamamlanacaktır.", function() {
 
-        return;
+            showScreen("endScreen");
+
+        });
+
+    } else {
+
+        startCountdown("Bir sonraki liste başlayacaktır.", function() {
+
+            currentWord = 0;
+
+            showScreen("presentationScreen");
+
+            showNextWord();
+
+        });
 
     }
 
+}
 
-    /* Sonraki liste öncesi 3 saniyelik geri sayım */
+
+/* 30 SANİYELİK GERİ SAYIM */
+
+function startCountdown(message, callback) {
 
     showScreen("waitingScreen");
 
-    setWaitingScreen(
-        "Yeni liste hazırlanıyor",
-        "Bir sonraki kelime listesi birazdan başlayacaktır.",
-        "Lütfen bekleyiniz.",
-        "saniye"
-    );
+    document.getElementById("waitingMessage").textContent =
+        message;
 
+    let remaining = 30;
 
-    startCountdown(LIST_WAIT, () => {
+    const timerNumber =
+        document.getElementById("timerNumber");
 
-        currentWord = 0;
+    const timerProgress =
+        document.getElementById("timerProgress");
 
-        showScreen("presentationScreen");
+    const circumference = 2 * Math.PI * 65;
 
-        showNextWord();
+    timerProgress.style.strokeDasharray = circumference;
 
-    });
+    timerProgress.style.strokeDashoffset = 0;
+
+    timerNumber.textContent = remaining;
+
+    const countdown = setInterval(function() {
+
+        remaining--;
+
+        timerNumber.textContent = remaining;
+
+        const progress =
+            (30 - remaining) / 30;
+
+        timerProgress.style.strokeDashoffset =
+            circumference * progress;
+
+        if (remaining <= 0) {
+
+            clearInterval(countdown);
+
+            callback();
+
+        }
+
+    }, 1000);
 
 }
 
@@ -705,7 +609,6 @@ function downloadResults() {
 
     let csv =
         "Katılımcı,Liste,Kelime,DahaOnceGosterildi,KatilimciCevabi,DogruYanlis,TepkiSuresi_ms\n";
-
 
     results.forEach(row => {
 
@@ -731,12 +634,10 @@ function downloadResults() {
 
     });
 
-
     const blob = new Blob(
         ["\uFEFF" + csv],
         {type: "text/csv;charset=utf-8;"}
     );
-
 
     const link = document.createElement("a");
 
@@ -748,7 +649,6 @@ function downloadResults() {
         "DRM_Sonuclari_" + participantCode + ".csv";
 
     link.click();
-
 
     setTimeout(() => URL.revokeObjectURL(url), 1000);
 

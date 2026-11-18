@@ -16,11 +16,13 @@ body {
     margin: 0;
     min-height: 100vh;
     font-family: Arial, sans-serif;
+
     background-image: url("arkaplan.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
+
     display: flex;
     justify-content: center;
     align-items: center;
@@ -134,6 +136,7 @@ p {
     font-weight: bold;
     color: #405b80;
 }
+
 </style>
 </head>
 
@@ -269,11 +272,6 @@ p {
 </div>
 
 
-<!-- EXCEL KÜTÜPHANESİ -->
-
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-
 <script>
 
 /* KELİME LİSTELERİ */
@@ -294,6 +292,9 @@ const lists = [
 
 
 /* TANIMA TESTLERİ */
+
+/* true = Daha önce gösterildi
+   false = Daha önce gösterilmedi */
 
 const tests = [
 
@@ -412,6 +413,8 @@ function showNextWord() {
 
     if (currentWord >= lists[currentList].length) {
 
+        /* TEST ARAYA BEKLEME KONMADAN BAŞLAR */
+
         startTest();
 
         return;
@@ -442,6 +445,8 @@ function startTest() {
     showScreen("testScreen");
 
     currentTest = [...tests[currentList]];
+
+    /* TEST KELİMELERİNİ KARIŞTIR */
 
     currentTest.sort(() => Math.random() - 0.5);
 
@@ -530,6 +535,8 @@ function finishList() {
 
     } else {
 
+        /* DİĞER LİSTELER ARASINDA 30 SANİYE BEKLE */
+
         startCountdown("Bir sonraki liste başlayacaktır.", function() {
 
             currentWord = 0;
@@ -595,66 +602,54 @@ function startCountdown(message, callback) {
 }
 
 
-/* EXCEL (.XLSX) İNDİR */
+/* CSV İNDİR */
 
 function downloadResults() {
 
-    if (typeof XLSX === "undefined") {
+    let csv =
+        "Katılımcı,Liste,Kelime,DahaOnceGosterildi,KatilimciCevabi,DogruYanlis,TepkiSuresi_ms\n";
 
-        alert("Excel dosyası oluşturulamadı. İnternet bağlantınızı kontrol edip sayfayı yenileyiniz.");
+    results.forEach(row => {
 
-        return;
+        csv += [
 
-    }
+            row.participant,
 
-    const excelData = results.map(row => ({
+            row.list,
 
-        "Katılımcı": row.participant,
+            row.word,
 
-        "Liste": row.list,
-
-        "Kelime": row.word,
-
-        "Daha Önce Gösterildi":
             row.previouslyShown ? "Evet" : "Hayır",
 
-        "Katılımcı Cevabı":
             row.participantAnswer ? "Gördüm" : "Görmedim",
 
-        "Doğru / Yanlış":
             row.correct ? "Doğru" : "Yanlış",
 
-        "Tepki Süresi (ms)":
-            Number(row.responseTimeMs)
+            row.responseTimeMs
 
-    }));
+        ].map(value =>
+            '"' + String(value).replace(/"/g, '""') + '"'
+        ).join(",") + "\n";
 
-    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    });
 
-    worksheet["!cols"] = [
-
-        { wch: 18 },
-        { wch: 10 },
-        { wch: 18 },
-        { wch: 24 },
-        { wch: 20 },
-        { wch: 16 },
-        { wch: 22 }
-
-    ];
-
-    const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        worksheet,
-        "Deney Sonuçları"
+    const blob = new Blob(
+        ["\uFEFF" + csv],
+        {type: "text/csv;charset=utf-8;"}
     );
 
-    XLSX.writeFile(
-        workbook,
-        "DRM_Sonuclari_" + participantCode + ".xlsx"
-    );
+    const link = document.createElement("a");
+
+    const url = URL.createObjectURL(blob);
+
+    link.href = url;
+
+    link.download =
+        "DRM_Sonuclari_" + participantCode + ".csv";
+
+    link.click();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
 
 }
 

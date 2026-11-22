@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -16,13 +15,11 @@ body {
     margin: 0;
     min-height: 100vh;
     font-family: Arial, sans-serif;
-
     background-image: url("arkaplan.jpg");
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     background-attachment: fixed;
-
     display: flex;
     justify-content: center;
     align-items: center;
@@ -286,10 +283,10 @@ const lists = [
 
     ["Doktor", "Ameliyat", "İlaç", "Hemşire", "Hasta", "Serum", "Sağlık", "Tedavi"],
 
-    ["Deniz", "Dalga", "Kum", "Balık", "Mercan", "Okyanus", "Yosun", "Sahil", "Gemi"],
-  
-    ["Gezegen", "Galaksi", "Yıldız", "Güneş", "Neptün", "Meteor", "Astronot", "Uydu"]
+    ["Gezegen", "Galaksi", "Yıldız", "Güneş", "Neptün", "Meteor", "Astronot", "Uydu"],
 
+    ["Deniz", "Dalga", "Kum", "Balık", "Mercan", "Okyanus", "Yosun", "Sahil", "Kayık", "Gemi"]
+    
 ];
 
 
@@ -305,7 +302,7 @@ const tests = [
         ["Armut", true],
         ["Kiraz", false],
         ["Şeftali", true],
-        ["Üzüm", false],
+        ["Sebze", false],
         ["Kayısı", true],
         ["Meyve", false],
         ["Erik", true]
@@ -320,10 +317,10 @@ const tests = [
         ["Ritim", true],
         ["Sahne", false],
         ["Enstrüman", true],
-        ["Müzik", false]    
+        ["Müzik", false]
     ],
 
-      [
+    [
         ["Tabak", true],
         ["Kaşık", true],
         ["Mutfak", false],
@@ -344,27 +341,12 @@ const tests = [
         ["Hasta", true],
         ["Tedavi", true],
         ["Eczane", false],
-        ["Ameliyat", true]
-        ["Meslek", false]
-        ["Serum", true]
+        ["Ameliyat", true],
+        ["Meslek", false],
+        ["Serum", true],
         ["Sağlık", true]
     ],
 
-    [
-        ["Deniz", true],
-        ["Dalga", true],
-        ["Göl", false],
-        ["Kum", true],
-        ["Sahil", true],
-        ["Kayık", false],
-        ["Gemi", true],
-        ["Balık", true],
-        ["İçecek", false],
-        ["Okyanus", true],
-        ["Mercan", true],
-        ["Yosun", true]   
-    ],
-    
     [
         ["Gezegen", true],
         ["Galaksi", true],
@@ -380,6 +362,22 @@ const tests = [
         ["Roket", false],
         ["Uzaylı", false],
         ["Teleskop", false]
+    ],
+    
+    [
+        ["Deniz", true],
+        ["Dalga", true],
+        ["Göl", false],
+        ["Kum", true],
+        ["Sahil", true],
+        ["Kayık", true],
+        ["Gemi", true],
+        ["Balık", true],
+        ["İçecek", false],
+        ["Okyanus", true],
+        ["Mercan", true],
+        ["Sörf", false],
+        ["Yosun", true]
     ],
 
 ];
@@ -442,8 +440,6 @@ function showNextWord() {
 
     if (currentWord >= lists[currentList].length) {
 
-        /* TEST ARAYA BEKLEME KONMADAN BAŞLAR */
-
         startTest();
 
         return;
@@ -474,8 +470,6 @@ function startTest() {
     showScreen("testScreen");
 
     currentTest = [...tests[currentList]];
-
-    /* TEST KELİMELERİNİ KARIŞTIR */
 
     currentTest.sort(() => Math.random() - 0.5);
 
@@ -556,15 +550,11 @@ function finishList() {
 
     currentList++;
 
-    /* SON TESTTEN SONRA BEKLEME YOK */
-
     if (currentList >= lists.length) {
 
         showScreen("endScreen");
 
     } else {
-
-        /* DİĞER LİSTELER ARASINDA 30 SANİYE BEKLE */
 
         startCountdown("Bir sonraki liste başlayacaktır.", function() {
 

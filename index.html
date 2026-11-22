@@ -1,9 +1,9 @@
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>DRM Bellek Deneyi</title>
 
 <style>
@@ -92,7 +92,7 @@ p {
     line-height: 1.7;
 }
 
-/* 30 SANİYELİK GERİ SAYIM */
+/* BEKLEME EKRANI */
 
 .timer-circle {
     width: 150px;
@@ -134,9 +134,106 @@ p {
     color: #405b80;
 }
 
+/* RENK EŞLEŞTİRME OYUNU */
+
+#matchingScreen h2 {
+    margin-bottom: 10px;
+}
+
+.match-instruction {
+    color: #555;
+    margin-bottom: 30px;
+}
+
+.match-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 25px;
+    max-width: 450px;
+    margin: 0 auto;
+}
+
+.lines-column,
+.balls-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    gap: 25px;
+    flex: 1;
+}
+
+.line-target {
+    height: 55px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    border: 2px dashed transparent;
+    transition: background 0.2s;
+}
+
+.color-line {
+    width: 100%;
+    height: 7px;
+    border-radius: 10px;
+}
+
+.line-target.matched {
+    background: rgba(50,122,89,0.12);
+    border-color: #327a59;
+}
+
+.line-target.wrong {
+    background: rgba(163,77,77,0.12);
+}
+
+.color-ball {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid rgba(0,0,0,0.08);
+    cursor: grab;
+    margin: 0 auto;
+    touch-action: none;
+    user-select: none;
+    transition: transform 0.15s, opacity 0.2s;
+}
+
+.color-ball:active {
+    cursor: grabbing;
+    transform: scale(1.12);
+}
+
+.color-ball.selected {
+    outline: 4px solid #405b80;
+    outline-offset: 4px;
+    transform: scale(1.1);
+}
+
+.color-ball.matched {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.match-message {
+    min-height: 25px;
+    margin-top: 25px;
+    color: #327a59;
+    font-weight: bold;
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 22px;
+    }
+
+    .match-area {
+        gap: 15px;
+    }
+}
 </style>
 
-<!-- Excel dosyası oluşturmak için gerekli kütüphane -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
 </head>
@@ -159,7 +256,8 @@ p {
 
         <p>
             Her kelime 1,2 saniye boyunca gösterilecektir.
-            Her listenin ardından bir tanıma testi yapılacaktır.
+            İlk beş listenin ardından bir renk eşleştirme
+            görevi ve tanıma testi yapılacaktır.
         </p>
 
         <p>
@@ -187,7 +285,7 @@ p {
     </div>
 
 
-    <!-- 30 SANİYELİK BEKLEME -->
+    <!-- BEKLEME EKRANI -->
 
     <div id="waitingScreen" class="hidden">
 
@@ -201,19 +299,13 @@ p {
 
             <svg viewBox="0 0 150 150">
 
-                <circle
-                    class="timer-background"
-                    cx="75"
-                    cy="75"
-                    r="65">
+                <circle class="timer-background"
+                    cx="75" cy="75" r="65">
                 </circle>
 
-                <circle
-                    id="timerProgress"
+                <circle id="timerProgress"
                     class="timer-progress"
-                    cx="75"
-                    cy="75"
-                    r="65">
+                    cx="75" cy="75" r="65">
                 </circle>
 
             </svg>
@@ -223,6 +315,33 @@ p {
             </div>
 
         </div>
+
+    </div>
+
+
+    <!-- RENK EŞLEŞTİRME -->
+
+    <div id="matchingScreen" class="hidden">
+
+        <h2>Renk Eşleştirme</h2>
+
+        <p class="match-instruction">
+            Her topu aynı renkteki çizgiyle eşleştiriniz.
+        </p>
+
+        <div class="match-area">
+
+            <div id="linesColumn" class="lines-column">
+            </div>
+
+            <div id="ballsColumn" class="balls-column">
+            </div>
+
+        </div>
+
+        <p id="matchMessage" class="match-message">
+            Topları sürükleyerek eşleştirebilirsiniz.
+        </p>
 
     </div>
 
@@ -296,9 +415,6 @@ const lists = [
 
 /* TANIMA TESTLERİ */
 
-/* true = Daha önce gösterildi
-   false = Daha önce gösterilmedi */
-
 const tests = [
 
     [
@@ -363,7 +479,7 @@ const tests = [
         ["Astronot", true],
         ["Uydu", true],
         ["Yörünge", true],
-        ["Canlı", false],  
+        ["Canlı", false]
     ],
 
     [
@@ -385,6 +501,26 @@ const tests = [
 ];
 
 
+/* RENK EŞLEŞTİRME GÖREVLERİ */
+
+/* Her görevde üç farklı renk bulunur.
+   Topların sırası her görevde değiştirilir. */
+
+const matchingTasks = [
+
+    ["#E53935", "#2878D0", "#F4C430"],
+
+    ["#26A269", "#8E44AD", "#F28C28"],
+
+    ["#E75480", "#20B2AA", "#795548"],
+
+    ["#191970", "#808080", "#8B1A1A"],
+
+    ["#FF1493", "#00AEEF", "#7B68EE"]
+
+];
+
+
 /* DEĞİŞKENLER */
 
 let currentList = 0;
@@ -398,6 +534,9 @@ let testStartTime = 0;
 let results = [];
 
 let participantCode = "";
+
+let matchedCount = 0;
+let selectedBall = null;
 
 
 /* EKRAN DEĞİŞTİRME */
@@ -442,7 +581,18 @@ function showNextWord() {
 
     if (currentWord >= lists[currentList].length) {
 
-        startTest();
+        // İlk beş listeden sonra renk görevi.
+        // Altıncı listeden sonra doğrudan tanıma testi.
+
+        if (currentList < 5) {
+
+            startMatchingTask();
+
+        } else {
+
+            startTest();
+
+        }
 
         return;
 
@@ -461,6 +611,212 @@ function showNextWord() {
     currentWord++;
 
     setTimeout(showNextWord, 1200);
+
+}
+
+
+/* RENK EŞLEŞTİRME GÖREVİNİ BAŞLAT */
+
+function startMatchingTask() {
+
+    showScreen("matchingScreen");
+
+    matchedCount = 0;
+    selectedBall = null;
+
+    const colors = matchingTasks[currentList];
+
+    const linesColumn =
+        document.getElementById("linesColumn");
+
+    const ballsColumn =
+        document.getElementById("ballsColumn");
+
+    const matchMessage =
+        document.getElementById("matchMessage");
+
+    linesColumn.innerHTML = "";
+    ballsColumn.innerHTML = "";
+
+    matchMessage.textContent =
+        "Topları aynı renkteki çizgilerle eşleştiriniz.";
+
+
+    // ÇİZGİLERİ OLUŞTUR
+
+    colors.forEach(function(color, index) {
+
+        const target = document.createElement("div");
+
+        target.className = "line-target";
+
+        target.dataset.color = color;
+
+        const line = document.createElement("div");
+
+        line.className = "color-line";
+
+        line.style.backgroundColor = color;
+
+        target.appendChild(line);
+
+        target.addEventListener("dragover", function(e) {
+            e.preventDefault();
+        });
+
+        target.addEventListener("drop", function(e) {
+
+            e.preventDefault();
+
+            const draggedColor =
+                e.dataTransfer.getData("text/plain");
+
+            matchBall(draggedColor, target);
+
+        });
+
+        target.addEventListener("click", function() {
+
+            if (selectedBall) {
+
+                matchBall(selectedBall.dataset.color, target);
+
+            }
+
+        });
+
+        linesColumn.appendChild(target);
+
+    });
+
+
+    // TOPLARIN SIRASINI KARIŞTIR
+
+    const shuffledColors = [...colors];
+
+    shuffledColors.sort(() => Math.random() - 0.5);
+
+
+    // TOPLARI OLUŞTUR
+
+    shuffledColors.forEach(function(color) {
+
+        const ball = document.createElement("div");
+
+        ball.className = "color-ball";
+
+        ball.style.backgroundColor = color;
+
+        ball.dataset.color = color;
+
+        ball.draggable = true;
+
+        ball.addEventListener("dragstart", function(e) {
+
+            e.dataTransfer.setData("text/plain", color);
+
+            selectedBall = ball;
+
+        });
+
+        ball.addEventListener("click", function() {
+
+            if (ball.classList.contains("matched")) {
+                return;
+            }
+
+            document.querySelectorAll(".color-ball")
+                .forEach(b => b.classList.remove("selected"));
+
+            selectedBall = ball;
+
+            ball.classList.add("selected");
+
+        });
+
+        ballsColumn.appendChild(ball);
+
+    });
+
+}
+
+
+/* TOP VE ÇİZGİYİ EŞLEŞTİR */
+
+function matchBall(color, target) {
+
+    if (target.classList.contains("matched")) {
+        return;
+    }
+
+    if (target.dataset.color === color) {
+
+        const balls = document.querySelectorAll(".color-ball");
+
+        let correctBall = null;
+
+        balls.forEach(function(ball) {
+
+            if (
+                ball.dataset.color === color &&
+                !ball.classList.contains("matched")
+            ) {
+                correctBall = ball;
+            }
+
+        });
+
+        if (!correctBall) {
+            return;
+        }
+
+        // Eşleşen topu gizle.
+
+        correctBall.classList.add("matched");
+
+        // Eşleşen çizgiyi işaretle.
+
+        target.classList.add("matched");
+
+        matchedCount++;
+
+        selectedBall = null;
+
+        // Seçim görünümünü kaldır.
+
+        document.querySelectorAll(".color-ball")
+            .forEach(b => b.classList.remove("selected"));
+
+
+        if (matchedCount === 3) {
+
+            document.getElementById("matchMessage").textContent =
+                "Eşleştirme tamamlandı!";
+
+            // Performans kaydedilmez.
+            // Tanıma testi otomatik başlar.
+
+            setTimeout(function() {
+
+                startTest();
+
+            }, 700);
+
+        }
+
+    } else {
+
+        // Yanlış eşleşmede herhangi bir veri kaydedilmez.
+
+        target.classList.add("wrong");
+
+        setTimeout(function() {
+
+            target.classList.remove("wrong");
+
+        }, 400);
+
+    }
 
 }
 
@@ -558,22 +914,25 @@ function finishList() {
 
     } else {
 
-        startCountdown("Bir sonraki liste başlayacaktır.", function() {
+        startCountdown(
+            "Bir sonraki liste başlayacaktır.",
+            function() {
 
-            currentWord = 0;
+                currentWord = 0;
 
-            showScreen("presentationScreen");
+                showScreen("presentationScreen");
 
-            showNextWord();
+                showNextWord();
 
-        });
+            }
+        );
 
     }
 
 }
 
 
-/* 30 SANİYELİK GERİ SAYIM */
+/* 30 SANİYELİK LİSTELER ARASI BEKLEME */
 
 function startCountdown(message, callback) {
 
@@ -627,7 +986,6 @@ function startCountdown(message, callback) {
 
 function downloadResults() {
 
-    // Sonuçları Excel çalışma sayfasına dönüştür.
     const excelRows = results.map(row => ({
 
         "Katılımcı": row.participant,
@@ -659,27 +1017,19 @@ function downloadResults() {
     );
 
 
-    // Sütun genişliklerini ayarla.
     worksheet["!cols"] = [
 
         { wch: 15 },
-
         { wch: 10 },
-
         { wch: 20 },
-
         { wch: 23 },
-
         { wch: 20 },
-
         { wch: 15 },
-
         { wch: 20 }
 
     ];
 
 
-    // Excel dosyasını indir.
     XLSX.writeFile(
 
         workbook,

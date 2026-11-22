@@ -135,6 +135,10 @@ p {
 }
 
 </style>
+
+<!-- Excel dosyası oluşturmak için gerekli kütüphane -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
 </head>
 
 <body>
@@ -286,7 +290,7 @@ const lists = [
     ["Gezegen", "Galaksi", "Yıldız", "Güneş", "Neptün", "Meteor", "Astronot", "Uydu"],
 
     ["Deniz", "Dalga", "Kum", "Balık", "Mercan", "Okyanus", "Yosun", "Sahil", "Kayık", "Gemi"]
-    
+
 ];
 
 
@@ -363,7 +367,7 @@ const tests = [
         ["Uzaylı", false],
         ["Teleskop", false]
     ],
-    
+
     [
         ["Deniz", true],
         ["Dalga", true],
@@ -378,7 +382,7 @@ const tests = [
         ["Mercan", true],
         ["Sörf", false],
         ["Yosun", true]
-    ],
+    ]
 
 ];
 
@@ -621,54 +625,70 @@ function startCountdown(message, callback) {
 }
 
 
-/* CSV İNDİR */
+/* EXCEL OLARAK İNDİR */
 
 function downloadResults() {
 
-    let csv =
-        "Katılımcı,Liste,Kelime,DahaOnceGosterildi,KatilimciCevabi,DogruYanlis,TepkiSuresi_ms\n";
+    // Sonuçları Excel çalışma sayfasına dönüştür.
+    const excelRows = results.map(row => ({
 
-    results.forEach(row => {
+        "Katılımcı": row.participant,
 
-        csv += [
+        "Liste": row.list,
 
-            row.participant,
+        "Kelime": row.word,
 
-            row.list,
+        "Daha Önce Gösterildi": row.previouslyShown ? "Evet" : "Hayır",
 
-            row.word,
+        "Katılımcı Cevabı": row.participantAnswer ? "Gördüm" : "Görmedim",
 
-            row.previouslyShown ? "Evet" : "Hayır",
+        "Doğru/Yanlış": row.correct ? "Doğru" : "Yanlış",
 
-            row.participantAnswer ? "Gördüm" : "Görmedim",
+        "Tepki Süresi (ms)": Number(row.responseTimeMs)
 
-            row.correct ? "Doğru" : "Yanlış",
+    }));
 
-            row.responseTimeMs
 
-        ].map(value =>
-            '"' + String(value).replace(/"/g, '""') + '"'
-        ).join(",") + "\n";
+    const worksheet = XLSX.utils.json_to_sheet(excelRows);
 
-    });
+    const workbook = XLSX.utils.book_new();
 
-    const blob = new Blob(
-        ["\uFEFF" + csv],
-        {type: "text/csv;charset=utf-8;"}
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        worksheet,
+        "Deney Sonuçları"
     );
 
-    const link = document.createElement("a");
 
-    const url = URL.createObjectURL(blob);
+    // Sütun genişliklerini ayarla.
+    worksheet["!cols"] = [
 
-    link.href = url;
+        { wch: 15 },
 
-    link.download =
-        "DRM_Sonuclari_" + participantCode + ".csv";
+        { wch: 10 },
 
-    link.click();
+        { wch: 20 },
 
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+        { wch: 23 },
+
+        { wch: 20 },
+
+        { wch: 15 },
+
+        { wch: 20 }
+
+    ];
+
+
+    // Excel dosyasını indir.
+    XLSX.writeFile(
+
+        workbook,
+
+        "DRM_Sonuclari_" + participantCode + ".xlsx"
+
+    );
 
 }
 

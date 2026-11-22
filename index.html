@@ -287,9 +287,9 @@ const lists = [
 
     ["Doktor", "Ameliyat", "İlaç", "Hemşire", "Hasta", "Serum", "Sağlık", "Tedavi"],
 
-    ["Gezegen", "Galaksi", "Yıldız", "Güneş", "Neptün", "Meteor", "Astronot", "Uydu"],
+    ["Dünya", "Galaksi", "Yıldız", "Güneş", "Neptün", "Meteor", "Astronot", "Yörünge", "Uydu"],
 
-    ["Deniz", "Dalga", "Kum", "Balık", "Mercan", "Okyanus", "Yosun", "Sahil", "Gemi"]
+    ["Deniz", "Dalga", "Kum", "Balık", "Mercan", "Okyanus", "Yosun", "Sahil", "Körfez", "Gemi"]
 
 ];
 
@@ -352,20 +352,18 @@ const tests = [
     ],
 
     [
-        ["Gezegen", true],
+        ["Gezegen", false],
         ["Galaksi", true],
         ["Uzay", false],
         ["Neptün", true],
-        ["Dünya", false],
+        ["Dünya", true],
         ["Yıldız", true],
-        ["Mars", false],
         ["Güneş", true],
         ["Meteor", true],
         ["Astronot", true],
         ["Uydu", true],
-        ["Roket", false],
-        ["Uzaylı", false],
-        ["Teleskop", false]
+        ["Yörünge", true],
+        ["Canlı", false],  
     ],
 
     [
@@ -380,6 +378,7 @@ const tests = [
         ["Okyanus", true],
         ["Mercan", true],
         ["Sörf", false],
+        ["Körfez", true],
         ["Yosun", true]
     ]
 

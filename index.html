@@ -278,15 +278,17 @@ p {
 
 const lists = [
 
-    ["Gezegen", "Galaksi", "Yıldız", "Güneş", "Neptün", "Meteor", "Astronot", "Uydu"],
+    ["Elma", "Armut", "Şeftali", "Kayısı", "Erik"],
 
-    ["Müzik", "Nota", "Şarkı", "Melodi", "Ritim"],
+    ["Çalgı", "Nota", "Şarkı", "Melodi", "Ritim", "Enstrüman"],
 
-    ["Doktor", "Hastane", "Hemşire", "Hasta", "Tedavi"],
+    ["Tabak", "Çatal", "Kaşık", "Bıçak", "Bardak", "Tencere", "Tava"],
 
-    ["Deniz", "Dalga", "Kum", "Sahil", "Gemi"],
+    ["Doktor", "Ameliyat", "İlaç", "Hemşire", "Hasta", "Serum", "Sağlık", "Tedavi"],
 
-    ["Kitap", "Sayfa", "Okumak", "Yazar", "Kütüphane"]
+    ["Deniz", "Dalga", "Kum", "Balık", "Mercan", "Okyanus", "Yosun", "Sahil", "Gemi"],
+  
+    ["Gezegen", "Galaksi", "Yıldız", "Güneş", "Neptün", "Meteor", "Astronot", "Uydu"]
 
 ];
 
@@ -298,6 +300,71 @@ const lists = [
 
 const tests = [
 
+    [
+        ["Elma", true],
+        ["Armut", true],
+        ["Kiraz", false],
+        ["Şeftali", true],
+        ["Üzüm", false],
+        ["Kayısı", true],
+        ["Meyve", false],
+        ["Erik", true]
+    ],
+
+    [
+        ["Çalgı", true],
+        ["Nota", true],
+        ["Dans", false],
+        ["Şarkı", true],
+        ["Melodi", true],
+        ["Ritim", true],
+        ["Sahne", false],
+        ["Enstrüman", true],
+        ["Müzik", false]    
+    ],
+
+      [
+        ["Tabak", true],
+        ["Kaşık", true],
+        ["Mutfak", false],
+        ["Çatal", true],
+        ["Bıçak", true],
+        ["Bardak", true],
+        ["Kupa", false],
+        ["Ev", false],
+        ["Tencere", true],
+        ["Tava", true]
+    ],
+
+    [
+        ["Doktor", true],
+        ["Hastane", false],
+        ["İlaç", true],
+        ["Hemşire", true],
+        ["Hasta", true],
+        ["Tedavi", true],
+        ["Eczane", false],
+        ["Ameliyat", true]
+        ["Meslek", false]
+        ["Serum", true]
+        ["Sağlık", true]
+    ],
+
+    [
+        ["Deniz", true],
+        ["Dalga", true],
+        ["Göl", false],
+        ["Kum", true],
+        ["Sahil", true],
+        ["Kayık", false],
+        ["Gemi", true],
+        ["Balık", true],
+        ["İçecek", false],
+        ["Okyanus", true],
+        ["Mercan", true],
+        ["Yosun", true]   
+    ],
+    
     [
         ["Gezegen", true],
         ["Galaksi", true],
@@ -314,50 +381,6 @@ const tests = [
         ["Uzaylı", false],
         ["Teleskop", false]
     ],
-
-    [
-        ["Müzik", true],
-        ["Nota", true],
-        ["Dans", false],
-        ["Şarkı", true],
-        ["Melodi", true],
-        ["Ritim", true],
-        ["Sahne", false],
-        ["Enstrüman", false]
-    ],
-
-    [
-        ["Doktor", true],
-        ["Hastane", true],
-        ["İlaç", false],
-        ["Hemşire", true],
-        ["Hasta", true],
-        ["Tedavi", true],
-        ["Eczane", false],
-        ["Ameliyat", false]
-    ],
-
-    [
-        ["Deniz", true],
-        ["Dalga", true],
-        ["Göl", false],
-        ["Kum", true],
-        ["Sahil", true],
-        ["Gemi", true],
-        ["Balık", false],
-        ["Okyanus", false]
-    ],
-
-    [
-        ["Kitap", true],
-        ["Sayfa", true],
-        ["Kalem", false],
-        ["Okumak", true],
-        ["Yazar", true],
-        ["Kütüphane", true],
-        ["Defter", false],
-        ["Roman", false]
-    ]
 
 ];
 

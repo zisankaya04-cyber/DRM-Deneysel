@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -63,7 +62,6 @@ button:disabled { opacity: 0.5; cursor: default; }
 p { line-height: 1.7; }
 
 /* 5 SANİYELİK 3B LOGO AÇILIŞI */
-
 #logoSplash {
     position: fixed;
     inset: 0;
@@ -140,12 +138,8 @@ p { line-height: 1.7; }
 }
 
 @keyframes logo3D {
-    0%, 100% {
-        transform: rotateY(-13deg) rotateX(5deg) scale(0.98);
-    }
-    50% {
-        transform: rotateY(13deg) rotateX(-5deg) scale(1.02);
-    }
+    0%, 100% { transform: rotateY(-13deg) rotateX(5deg) scale(0.98); }
+    50% { transform: rotateY(13deg) rotateX(-5deg) scale(1.02); }
 }
 
 @keyframes logoFloat {
@@ -154,14 +148,8 @@ p { line-height: 1.7; }
 }
 
 @keyframes logoGlow {
-    0%, 100% {
-        opacity: 0.35;
-        transform: scale(0.95);
-    }
-    50% {
-        opacity: 1;
-        transform: scale(1.08);
-    }
+    0%, 100% { opacity: 0.35; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.08); }
 }
 
 @keyframes logoShine {
@@ -170,7 +158,6 @@ p { line-height: 1.7; }
 }
 
 /* BEKLEME EKRANI */
-
 .timer-circle {
     width: 150px;
     height: 150px;
@@ -209,8 +196,7 @@ p { line-height: 1.7; }
     color: #405b80;
 }
 
-/* RENK EŞLEŞTİRME OYUNU */
-
+/* RENK EŞLEŞTİRME */
 #matchingScreen h2 { margin-bottom: 10px; }
 .match-instruction { color: #555; margin-bottom: 30px; }
 
@@ -252,9 +238,7 @@ p { line-height: 1.7; }
     border-color: #327a59;
 }
 
-.line-target.wrong {
-    background: rgba(163,77,77,0.12);
-}
+.line-target.wrong { background: rgba(163,77,77,0.12); }
 
 .color-ball {
     width: 48px;
@@ -297,10 +281,8 @@ p { line-height: 1.7; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .logo-wrapper,
-    .logo-wrapper img,
-    .logo-wrapper::before,
-    .logo-wrapper::after {
+    .logo-wrapper, .logo-wrapper img,
+    .logo-wrapper::before, .logo-wrapper::after {
         animation-duration: 8s;
     }
 }
@@ -311,45 +293,33 @@ p { line-height: 1.7; }
 
 <body>
 
-<!-- LOGO AÇILIŞ EKRANI: 5 SANİYE -->
-
-<div id="logoSplash" aria-label="Üniversite logosu açılış animasyonu">
+<!-- LOGO AÇILIŞ EKRANI -->
+<div id="logoSplash">
     <div class="logo-wrapper">
-        <img src="arkaplan(1).jpg"
-             alt="Ağrı İbrahim Çeçen Üniversitesi Edebiyat Fakültesi logosu">
+        <img src="arkaplan(1).jpg" alt="Üniversite logosu">
     </div>
 </div>
 
 <div class="container">
 
-    <!-- BAŞLANGIÇ -->
-
     <div id="startScreen">
         <h1>Bellek Deneyi</h1>
-
         <p>
             Birazdan ekranda kelimeler göreceksiniz.
             Kelimeleri dikkatlice inceleyiniz ve aklınızda
             tutmaya çalışınız.
         </p>
-
         <p>
             Her kelime 1,2 saniye boyunca gösterilecektir.
             İlk beş listenin ardından bir renk eşleştirme
             görevi ve tanıma testi yapılacaktır.
         </p>
-
         <p>
             Tanıma testinde karşınıza çıkan kelimelerden
             daha önce gördüklerinizi belirtmeniz istenecektir.
         </p>
-
-        <button class="start" onclick="startExperiment()">
-            Deneye Başla
-        </button>
+        <button class="start" onclick="startExperiment()">Deneye Başla</button>
     </div>
-
-    <!-- KELİME SUNUMU -->
 
     <div id="presentationScreen" class="hidden">
         <h2 id="listNumber"></h2>
@@ -357,195 +327,96 @@ p { line-height: 1.7; }
         <p id="presentationProgress"></p>
     </div>
 
-    <!-- BEKLEME EKRANI -->
-
     <div id="waitingScreen" class="hidden">
         <h2>Lütfen bekleyiniz...</h2>
-
-        <p id="waitingMessage">
-            Bir sonraki aşama başlayacaktır.
-        </p>
-
+        <p id="waitingMessage">Bir sonraki aşama başlayacaktır.</p>
         <div class="timer-circle">
             <svg viewBox="0 0 150 150">
-                <circle class="timer-background"
-                    cx="75" cy="75" r="65"></circle>
-
-                <circle id="timerProgress"
-                    class="timer-progress"
-                    cx="75" cy="75" r="65"></circle>
+                <circle class="timer-background" cx="75" cy="75" r="65"></circle>
+                <circle id="timerProgress" class="timer-progress" cx="75" cy="75" r="65"></circle>
             </svg>
-
             <div id="timerNumber" class="timer-number">30</div>
         </div>
     </div>
 
-    <!-- RENK EŞLEŞTİRME -->
-
     <div id="matchingScreen" class="hidden">
         <h2>Renk Eşleştirme</h2>
-
         <p class="match-instruction">
             Her topu aynı renkteki çizgiyle eşleştiriniz.
         </p>
-
         <div class="match-area">
             <div id="linesColumn" class="lines-column"></div>
             <div id="ballsColumn" class="balls-column"></div>
         </div>
-
         <p id="matchMessage" class="match-message">
             Topları sürükleyerek eşleştirebilirsiniz.
         </p>
     </div>
 
-    <!-- TANIMA TESTİ -->
-
     <div id="testScreen" class="hidden">
         <h2>Tanıma Testi</h2>
-
-        <p>
-            Bu kelimeyi az önceki listede gördünüz mü?
-        </p>
-
+        <p>Bu kelimeyi az önceki listede gördünüz mü?</p>
         <div id="testWord"></div>
-
         <div id="choices">
-            <button class="yes" onclick="answer(true)">
-                Gördüm
-            </button>
-
-            <button class="no" onclick="answer(false)">
-                Görmedim
-            </button>
+            <button class="yes" onclick="answer(true)">Gördüm</button>
+            <button class="no" onclick="answer(false)">Görmedim</button>
         </div>
-
         <p id="progress"></p>
     </div>
-
-    <!-- BİTİŞ -->
 
     <div id="endScreen" class="hidden">
         <h2>Deney Tamamlandı</h2>
         <p>Katılımınız için teşekkür ederiz.</p>
-
-        <button class="start" onclick="downloadResults()">
-            Sonuçları İndir
-        </button>
+        <button class="start" onclick="downloadResults()">Sonuçları İndir</button>
     </div>
-
 </div>
 
 <script>
-
 /* KELİME LİSTELERİ */
-
 const lists = [
     ["Elma", "Şeftali", "Kayısı", "Armut", "Erik"],
-
     ["Ritim", "Çalgı", "Nota", "Enstürman", "Melodi", "Şarkı"],
-
     ["Tabak", "Kaşık", "Bıçak", "Bardak", "Tencere", "Çatal", "Tava"],
-
-    ["İlaç", "Serum", "Doktor", "Hemşire", "Tedavi",
-     "Ameliyat", "Sağlık", "Hasta"],
-
-    ["Güneş", "Uydu", "Yıldız", "Dünya", "Yörünge",
-     "Meteor", "Astronot", "Neptün", "Galaksi"],
-
-    ["Körfez", "Dalga", "Gemi", "Balık", "Mercan",
-     "Okyanus", "Yosun", "Sahil", "Deniz", "Kum"]
+    ["İlaç", "Serum", "Doktor", "Hemşire", "Tedavi", "Ameliyat", "Sağlık", "Hasta"],
+    ["Güneş", "Uydu", "Yıldız", "Dünya", "Yörünge", "Meteor", "Astronot", "Neptün", "Galaksi"],
+    ["Körfez", "Dalga", "Gemi", "Balık", "Mercan", "Okyanus", "Yosun", "Sahil", "Deniz", "Kum"]
 ];
 
-
 /* TANIMA TESTLERİ */
-
 const tests = [
     [
-        ["Elma", true],
-        ["Armut", true],
-        ["Kiraz", false],
-        ["Şeftali", true],
-        ["Sebze", false],
-        ["Kayısı", true],
-        ["Meyve", false],
-        ["Erik", true]
+        ["Elma", true], ["Armut", true], ["Kiraz", false], ["Şeftali", true],
+        ["Sebze", false], ["Kayısı", true], ["Meyve", false], ["Erik", true]
     ],
-
     [
-        ["Çalgı", true],
-        ["Nota", true],
-        ["Dans", false],
-        ["Şarkı", true],
-        ["Melodi", true],
-        ["Ritim", true],
-        ["Sahne", false],
-        ["Enstrüman", true],
-        ["Müzik", false]
+        ["Çalgı", true], ["Nota", true], ["Dans", false], ["Şarkı", true],
+        ["Melodi", true], ["Ritim", true], ["Sahne", false],
+        ["Enstrüman", true], ["Müzik", false]
     ],
-
     [
-        ["Tabak", true],
-        ["Kaşık", true],
-        ["Mutfak", false],
-        ["Çatal", true],
-        ["Bıçak", true],
-        ["Bardak", true],
-        ["Kupa", false],
-        ["Ev", false],
-        ["Tencere", true],
-        ["Tava", true]
+        ["Tabak", true], ["Kaşık", true], ["Mutfak", false], ["Çatal", true],
+        ["Bıçak", true], ["Bardak", true], ["Kupa", false], ["Ev", false],
+        ["Tencere", true], ["Tava", true]
     ],
-
     [
-        ["Doktor", true],
-        ["Hastane", false],
-        ["İlaç", true],
-        ["Hemşire", true],
-        ["Hasta", true],
-        ["Tedavi", true],
-        ["Eczane", false],
-        ["Ameliyat", true],
-        ["Meslek", false],
-        ["Serum", true],
-        ["Sağlık", true]
+        ["Doktor", true], ["Hastane", false], ["İlaç", true], ["Hemşire", true],
+        ["Hasta", true], ["Tedavi", true], ["Eczane", false],
+        ["Ameliyat", true], ["Meslek", false], ["Serum", true], ["Sağlık", true]
     ],
-
     [
-        ["Gezegen", false],
-        ["Galaksi", true],
-        ["Uzay", false],
-        ["Neptün", true],
-        ["Dünya", true],
-        ["Yıldız", true],
-        ["Güneş", true],
-        ["Meteor", true],
-        ["Astronot", true],
-        ["Uydu", true],
-        ["Yörünge", true],
-        ["Canlı", false]
+        ["Gezegen", false], ["Galaksi", true], ["Uzay", false], ["Neptün", true],
+        ["Dünya", true], ["Yıldız", true], ["Güneş", true], ["Meteor", true],
+        ["Astronot", true], ["Uydu", true], ["Yörünge", true], ["Canlı", false]
     ],
-
     [
-        ["Deniz", true],
-        ["Dalga", true],
-        ["Göl", false],
-        ["Kum", true],
-        ["Sahil", true],
-        ["Gemi", true],
-        ["Balık", true],
-        ["İçecek", false],
-        ["Okyanus", true],
-        ["Mercan", true],
-        ["Sörf", false],
-        ["Körfez", true],
-        ["Yosun", true]
+        ["Deniz", true], ["Dalga", true], ["Göl", false], ["Kum", true],
+        ["Sahil", true], ["Gemi", true], ["Balık", true], ["İçecek", false],
+        ["Okyanus", true], ["Mercan", true], ["Sörf", false],
+        ["Körfez", true], ["Yosun", true]
     ]
 ];
 
-
 /* RENK EŞLEŞTİRME GÖREVLERİ */
-
 const matchingTasks = [
     ["#E53935", "#2878D0", "#F4C430"],
     ["#26A269", "#8E44AD", "#F28C28"],
@@ -554,37 +425,25 @@ const matchingTasks = [
     ["#FF1493", "#00AEEF", "#7B68EE"]
 ];
 
-
 /* DEĞİŞKENLER */
-
 let currentList = 0;
 let currentWord = 0;
-
 let currentTest = [];
 let currentTestIndex = 0;
-
 let testStartTime = 0;
-
 let results = [];
-
 let participantCode = "";
-
 let matchedCount = 0;
 let selectedBall = null;
 
-
 /* EKRAN DEĞİŞTİRME */
-
 function showScreen(id) {
     document.querySelectorAll(".container > div")
         .forEach(div => div.classList.add("hidden"));
-
     document.getElementById(id).classList.remove("hidden");
 }
 
-
 /* DENEYİ BAŞLAT */
-
 function startExperiment() {
     participantCode = prompt("Katılımcı numarasını giriniz:");
 
@@ -594,7 +453,6 @@ function startExperiment() {
     }
 
     participantCode = participantCode.trim();
-
     currentList = 0;
     currentWord = 0;
     results = [];
@@ -603,18 +461,14 @@ function startExperiment() {
     showNextWord();
 }
 
-
 /* KELİMELERİ GÖSTER */
-
 function showNextWord() {
     if (currentWord >= lists[currentList].length) {
-
         if (currentList < 5) {
             startMatchingTask();
         } else {
             startTest();
         }
-
         return;
     }
 
@@ -625,54 +479,36 @@ function showNextWord() {
         lists[currentList][currentWord];
 
     document.getElementById("presentationProgress").textContent =
-        "Kelime " + (currentWord + 1) + " / " +
-        lists[currentList].length;
+        "Kelime " + (currentWord + 1) + " / " + lists[currentList].length;
 
     currentWord++;
-
     setTimeout(showNextWord, 1200);
 }
 
-
 /* RENK EŞLEŞTİRME GÖREVİNİ BAŞLAT */
-
 function startMatchingTask() {
     showScreen("matchingScreen");
-
     matchedCount = 0;
     selectedBall = null;
 
     const colors = matchingTasks[currentList];
-
-    const linesColumn =
-        document.getElementById("linesColumn");
-
-    const ballsColumn =
-        document.getElementById("ballsColumn");
-
-    const matchMessage =
-        document.getElementById("matchMessage");
+    const linesColumn = document.getElementById("linesColumn");
+    const ballsColumn = document.getElementById("ballsColumn");
+    const matchMessage = document.getElementById("matchMessage");
 
     linesColumn.innerHTML = "";
     ballsColumn.innerHTML = "";
-
     matchMessage.textContent =
         "Topları aynı renkteki çizgilerle eşleştiriniz.";
 
-
-    /* ÇİZGİLERİ OLUŞTUR */
-
     colors.forEach(function(color) {
         const target = document.createElement("div");
-
         target.className = "line-target";
         target.dataset.color = color;
 
         const line = document.createElement("div");
-
         line.className = "color-line";
         line.style.backgroundColor = color;
-
         target.appendChild(line);
 
         target.addEventListener("dragover", function(e) {
@@ -681,10 +517,7 @@ function startMatchingTask() {
 
         target.addEventListener("drop", function(e) {
             e.preventDefault();
-
-            const draggedColor =
-                e.dataTransfer.getData("text/plain");
-
+            const draggedColor = e.dataTransfer.getData("text/plain");
             matchBall(draggedColor, target);
         });
 
@@ -697,19 +530,11 @@ function startMatchingTask() {
         linesColumn.appendChild(target);
     });
 
-
-    /* TOPLARIN SIRASINI KARIŞTIR */
-
     const shuffledColors = [...colors];
-
     shuffledColors.sort(() => Math.random() - 0.5);
-
-
-    /* TOPLARI OLUŞTUR */
 
     shuffledColors.forEach(function(color) {
         const ball = document.createElement("div");
-
         ball.className = "color-ball";
         ball.style.backgroundColor = color;
         ball.dataset.color = color;
@@ -721,9 +546,7 @@ function startMatchingTask() {
         });
 
         ball.addEventListener("click", function() {
-            if (ball.classList.contains("matched")) {
-                return;
-            }
+            if (ball.classList.contains("matched")) return;
 
             document.querySelectorAll(".color-ball")
                 .forEach(b => b.classList.remove("selected"));
@@ -736,35 +559,25 @@ function startMatchingTask() {
     });
 }
 
-
 /* TOP VE ÇİZGİYİ EŞLEŞTİR */
-
 function matchBall(color, target) {
-    if (target.classList.contains("matched")) {
-        return;
-    }
+    if (target.classList.contains("matched")) return;
 
     if (target.dataset.color === color) {
         const balls = document.querySelectorAll(".color-ball");
-
         let correctBall = null;
 
         balls.forEach(function(ball) {
-            if (
-                ball.dataset.color === color &&
-                !ball.classList.contains("matched")
-            ) {
+            if (ball.dataset.color === color &&
+                !ball.classList.contains("matched")) {
                 correctBall = ball;
             }
         });
 
-        if (!correctBall) {
-            return;
-        }
+        if (!correctBall) return;
 
         correctBall.classList.add("matched");
         target.classList.add("matched");
-
         matchedCount++;
         selectedBall = null;
 
@@ -779,7 +592,6 @@ function matchBall(color, target) {
                 startTest();
             }, 700);
         }
-
     } else {
         target.classList.add("wrong");
 
@@ -789,24 +601,16 @@ function matchBall(color, target) {
     }
 }
 
-
 /* TESTİ BAŞLAT */
-
 function startTest() {
     showScreen("testScreen");
-
     currentTest = [...tests[currentList]];
-
     currentTest.sort(() => Math.random() - 0.5);
-
     currentTestIndex = 0;
-
     showTestWord();
 }
 
-
 /* TEST KELİMESİNİ GÖSTER */
-
 function showTestWord() {
     if (currentTestIndex >= currentTest.length) {
         finishList();
@@ -815,27 +619,19 @@ function showTestWord() {
 
     const item = currentTest[currentTestIndex];
 
-    document.getElementById("testWord").textContent =
-        item[0];
+    document.getElementById("testWord").textContent = item[0];
 
     document.getElementById("progress").textContent =
-        "Kelime " + (currentTestIndex + 1) +
-        " / " + currentTest.length;
+        "Kelime " + (currentTestIndex + 1) + " / " + currentTest.length;
 
     testStartTime = performance.now();
 }
 
-
 /* CEVAP AL */
-
 function answer(response) {
-    const responseTime =
-        performance.now() - testStartTime;
-
+    const responseTime = performance.now() - testStartTime;
     const item = currentTest[currentTestIndex];
-
     const correctAnswer = item[1];
-
     const isCorrect = response === correctAnswer;
 
     results.push({
@@ -849,65 +645,44 @@ function answer(response) {
     });
 
     currentTestIndex++;
-
     showTestWord();
 }
 
-
 /* LİSTEYİ BİTİR */
-
 function finishList() {
     currentList++;
 
     if (currentList >= lists.length) {
         showScreen("endScreen");
     } else {
-        startCountdown(
-            "Bir sonraki liste başlayacaktır.",
-            function() {
-                currentWord = 0;
-
-                showScreen("presentationScreen");
-
-                showNextWord();
-            }
-        );
+        startCountdown("Bir sonraki liste başlayacaktır.", function() {
+            currentWord = 0;
+            showScreen("presentationScreen");
+            showNextWord();
+        });
     }
 }
 
-
 /* 30 SANİYELİK LİSTELER ARASI BEKLEME */
-
 function startCountdown(message, callback) {
     showScreen("waitingScreen");
-
-    document.getElementById("waitingMessage").textContent =
-        message;
+    document.getElementById("waitingMessage").textContent = message;
 
     let remaining = 30;
-
-    const timerNumber =
-        document.getElementById("timerNumber");
-
-    const timerProgress =
-        document.getElementById("timerProgress");
-
+    const timerNumber = document.getElementById("timerNumber");
+    const timerProgress = document.getElementById("timerProgress");
     const circumference = 2 * Math.PI * 65;
 
     timerProgress.style.strokeDasharray = circumference;
     timerProgress.style.strokeDashoffset = 0;
-
     timerNumber.textContent = remaining;
 
     const countdown = setInterval(function() {
         remaining--;
-
         timerNumber.textContent = remaining;
 
         const progress = (30 - remaining) / 30;
-
-        timerProgress.style.strokeDashoffset =
-            circumference * progress;
+        timerProgress.style.strokeDashoffset = circumference * progress;
 
         if (remaining <= 0) {
             clearInterval(countdown);
@@ -916,9 +691,7 @@ function startCountdown(message, callback) {
     }, 1000);
 }
 
-
 /* EXCEL OLARAK İNDİR */
-
 function downloadResults() {
     if (typeof XLSX === "undefined") {
         alert("Excel dosyası oluşturulamadı. İnternet bağlantınızı kontrol edip tekrar deneyiniz.");
@@ -936,7 +709,6 @@ function downloadResults() {
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(excelRows);
-
     const workbook = XLSX.utils.book_new();
 
     XLSX.utils.book_append_sheet(
@@ -946,13 +718,8 @@ function downloadResults() {
     );
 
     worksheet["!cols"] = [
-        { wch: 15 },
-        { wch: 10 },
-        { wch: 20 },
-        { wch: 23 },
-        { wch: 20 },
-        { wch: 15 },
-        { wch: 20 }
+        { wch: 15 }, { wch: 10 }, { wch: 20 }, { wch: 23 },
+        { wch: 20 }, { wch: 15 }, { wch: 20 }
     ];
 
     XLSX.writeFile(
@@ -961,22 +728,17 @@ function downloadResults() {
     );
 }
 
-
 /* LOGO 5 SANİYE GÖRÜNÜR, SONRA BAŞLANGIÇ EKRANI AÇILIR */
-
 window.addEventListener("load", function() {
     setTimeout(function() {
         const splash = document.getElementById("logoSplash");
-
         splash.classList.add("hide");
 
         setTimeout(function() {
             splash.style.display = "none";
         }, 1000);
-
     }, 5000);
 });
-
 </script>
 
 </body>

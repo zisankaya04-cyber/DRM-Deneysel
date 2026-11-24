@@ -196,7 +196,7 @@ p { line-height: 1.7; }
     color: #405b80;
 }
 
-/* RENK EŞLEŞTİRME */
+/* RENK EŞLEŞTİRME ESKİ TASARIM STİLLERİ */
 #matchingScreen h2 { margin-bottom: 10px; }
 .match-instruction { color: #555; margin-bottom: 30px; }
 
@@ -286,6 +286,65 @@ p { line-height: 1.7; }
         animation-duration: 8s;
     }
 }
+
+/* İKİ RESİM ARASINDAKİ FARKI BULMA */
+#differenceScreen { max-width: 1100px; }
+
+.difference-images {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 22px 0 12px;
+}
+
+.diff-panel { min-width: 0; }
+.diff-panel h3 { margin: 5px 0 10px; color: #405b80; }
+
+.diff-image-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    border: 2px solid #d6dce5;
+    border-radius: 12px;
+    background: #eef2f8;
+    line-height: 0;
+}
+
+.diff-image-wrap svg {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.difference-hotspot {
+    position: absolute;
+    width: 11%;
+    aspect-ratio: 1;
+    transform: translate(-50%, -50%);
+    border: 2px solid transparent;
+    border-radius: 50%;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    cursor: crosshair;
+}
+
+.difference-hotspot.found {
+    border-color: #16834a;
+    background: rgba(28, 190, 100, .22);
+    cursor: default;
+}
+
+#differenceStatus {
+    font-weight: bold;
+    color: #405b80;
+    min-height: 24px;
+}
+
+@media (max-width: 600px) {
+    .difference-images { grid-template-columns: 1fr; }
+    #differenceScreen { padding: 18px; }
+}
 </style>
 
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -296,7 +355,7 @@ p { line-height: 1.7; }
 <!-- LOGO AÇILIŞ EKRANI -->
 <div id="logoSplash">
     <div class="logo-wrapper">
-        <img src="arkaplan(1).jpg" alt="Üniversite logosu">
+        <img src="arkaplan.jpg" alt="Üniversite logosu">
     </div>
 </div>
 
@@ -311,8 +370,8 @@ p { line-height: 1.7; }
         </p>
         <p>
             Her kelime 1,2 saniye boyunca gösterilecektir.
-            İlk beş listenin ardından bir renk eşleştirme
-            görevi ve tanıma testi yapılacaktır.
+            Her listenin ardından iki resim arasındaki 5 farkı bulma
+            görevi, ardından tanıma testi yapılacaktır.
         </p>
         <p>
             Tanıma testinde karşınıza çıkan kelimelerden
@@ -339,39 +398,48 @@ p { line-height: 1.7; }
         </div>
     </div>
 
-    <div id="matchingScreen" class="hidden">
-        <h2>Renk Eşleştirme</h2>
-        <p class="match-instruction">
-            Her topu aynı renkteki çizgiyle eşleştiriniz.
-        </p>
-        <div class="match-area">
-            <div id="linesColumn" class="lines-column"></div>
-            <div id="ballsColumn" class="balls-column"></div>
+    <div id="differenceScreen" class="hidden">
+        <h2>İki Resim Arasındaki 5 Farkı Bulun</h2>
+        <p>İki resmi dikkatlice karşılaştırınız. Fark olduğunu düşündüğünüz bölgeye sağdaki resim üzerinde tıklayınız.</p>
+
+        <div class="difference-images">
+            <div class="diff-panel">
+                <h3>Resim A</h3>
+                <div class="diff-image-wrap" id="imageA"></div>
+            </div>
+
+            <div class="diff-panel">
+                <h3>Resim B</h3>
+                <div class="diff-image-wrap" id="imageB"></div>
+            </div>
         </div>
-        <p id="matchMessage" class="match-message">
-            Topları sürükleyerek eşleştirebilirsiniz.
-        </p>
+
+        <p id="differenceStatus">Bulunan fark: 0 / 5</p>
     </div>
 
     <div id="testScreen" class="hidden">
         <h2>Tanıma Testi</h2>
         <p>Bu kelimeyi az önceki listede gördünüz mü?</p>
         <div id="testWord"></div>
+
         <div id="choices">
             <button class="yes" onclick="answer(true)">Gördüm</button>
             <button class="no" onclick="answer(false)">Görmedim</button>
         </div>
+
         <p id="progress"></p>
     </div>
 
     <div id="endScreen" class="hidden">
         <h2>Deney Tamamlandı</h2>
         <p>Katılımınız için teşekkür ederiz.</p>
-        <button class="start" onclick="downloadResults()">Sonuçları İndir</button>
+        <button class="start" onclick="downloadResults()">Sonuçları Excel Olarak İndir</button>
     </div>
+
 </div>
 
 <script>
+
 /* KELİME LİSTELERİ */
 const lists = [
     ["Elma", "Şeftali", "Kayısı", "Armut", "Erik"],
@@ -416,13 +484,14 @@ const tests = [
     ]
 ];
 
-/* RENK EŞLEŞTİRME GÖREVLERİ */
-const matchingTasks = [
-    ["#E53935", "#2878D0", "#F4C430"],
-    ["#26A269", "#8E44AD", "#F28C28"],
-    ["#E75480", "#20B2AA", "#795548"],
-    ["#191970", "#808080", "#8B1A1A"],
-    ["#FF1493", "#00AEEF", "#7B68EE"]
+/* HER LİSTE İÇİN FARKLI RESİM ÇİFTİ */
+const picturePalettes = [
+    ["#b9e4ff", "#70b7e8", "#f6d365"],
+    ["#d7f0d0", "#86c58b", "#f5b7b1"],
+    ["#f8dfb5", "#e9a66b", "#a8d8ea"],
+    ["#d9d4f5", "#a69bd8", "#f4c2c2"],
+    ["#c8e6df", "#74b7a5", "#f7d794"],
+    ["#f4d7e8", "#d89bbd", "#a8c5e8"]
 ];
 
 /* DEĞİŞKENLER */
@@ -433,13 +502,16 @@ let currentTestIndex = 0;
 let testStartTime = 0;
 let results = [];
 let participantCode = "";
-let matchedCount = 0;
-let selectedBall = null;
+let foundDifferences = new Set();
+let differenceStartTime = 0;
+let differenceClicks = 0;
+let differenceResults = [];
 
 /* EKRAN DEĞİŞTİRME */
 function showScreen(id) {
     document.querySelectorAll(".container > div")
         .forEach(div => div.classList.add("hidden"));
+
     document.getElementById(id).classList.remove("hidden");
 }
 
@@ -456,6 +528,7 @@ function startExperiment() {
     currentList = 0;
     currentWord = 0;
     results = [];
+    differenceResults = [];
 
     showScreen("presentationScreen");
     showNextWord();
@@ -464,11 +537,7 @@ function startExperiment() {
 /* KELİMELERİ GÖSTER */
 function showNextWord() {
     if (currentWord >= lists[currentList].length) {
-        if (currentList < 5) {
-            startMatchingTask();
-        } else {
-            startTest();
-        }
+        startDifferenceGame();
         return;
     }
 
@@ -485,128 +554,132 @@ function showNextWord() {
     setTimeout(showNextWord, 1200);
 }
 
-/* RENK EŞLEŞTİRME GÖREVİNİ BAŞLAT */
-function startMatchingTask() {
-    showScreen("matchingScreen");
-    matchedCount = 0;
-    selectedBall = null;
+/* FARK BULMA RESİMLERİNİ OLUŞTUR */
+function makeScene(listIndex, alternate) {
+    const palette = picturePalettes[listIndex];
+    const sky = palette[0];
+    const ground = palette[1];
+    const sun = palette[2];
 
-    const colors = matchingTasks[currentList];
-    const linesColumn = document.getElementById("linesColumn");
-    const ballsColumn = document.getElementById("ballsColumn");
-    const matchMessage = document.getElementById("matchMessage");
+    const sunColor = alternate ? "#f28c28" : sun;
+    const doorColor = alternate ? "#2878a8" : "#8b5a3c";
 
-    linesColumn.innerHTML = "";
-    ballsColumn.innerHTML = "";
-    matchMessage.textContent =
-        "Topları aynı renkteki çizgilerle eşleştiriniz.";
+    const treeFruit = alternate ? `
+        <circle cx="458" cy="190" r="8" fill="#e53935"/>
+        <circle cx="490" cy="208" r="8" fill="#e53935"/>
+        <circle cx="445" cy="225" r="8" fill="#e53935"/>` : `
+        <circle cx="458" cy="190" r="8" fill="#e53935"/>
+        <circle cx="490" cy="208" r="8" fill="#e53935"/>`;
 
-    colors.forEach(function(color) {
-        const target = document.createElement("div");
-        target.className = "line-target";
-        target.dataset.color = color;
+    const cloud = alternate
+        ? `<path d="M390 91 Q380 65 407 62 Q420 34 446 57 Q474 49 481 79 Q505 83 496 103 L397 103 Q382 102 390 91" fill="#ffffff"/>`
+        : `<path d="M390 91 Q380 65 407 62 Q420 34 446 57 Q474 49 481 79 L397 103 Q382 102 390 91" fill="#ffffff"/>`;
 
-        const line = document.createElement("div");
-        line.className = "color-line";
-        line.style.backgroundColor = color;
-        target.appendChild(line);
+    const flowerColor = alternate ? "#9b59b6" : "#f06292";
 
-        target.addEventListener("dragover", function(e) {
-            e.preventDefault();
-        });
-
-        target.addEventListener("drop", function(e) {
-            e.preventDefault();
-            const draggedColor = e.dataTransfer.getData("text/plain");
-            matchBall(draggedColor, target);
-        });
-
-        target.addEventListener("click", function() {
-            if (selectedBall) {
-                matchBall(selectedBall.dataset.color, target);
-            }
-        });
-
-        linesColumn.appendChild(target);
-    });
-
-    const shuffledColors = [...colors];
-    shuffledColors.sort(() => Math.random() - 0.5);
-
-    shuffledColors.forEach(function(color) {
-        const ball = document.createElement("div");
-        ball.className = "color-ball";
-        ball.style.backgroundColor = color;
-        ball.dataset.color = color;
-        ball.draggable = true;
-
-        ball.addEventListener("dragstart", function(e) {
-            e.dataTransfer.setData("text/plain", color);
-            selectedBall = ball;
-        });
-
-        ball.addEventListener("click", function() {
-            if (ball.classList.contains("matched")) return;
-
-            document.querySelectorAll(".color-ball")
-                .forEach(b => b.classList.remove("selected"));
-
-            selectedBall = ball;
-            ball.classList.add("selected");
-        });
-
-        ballsColumn.appendChild(ball);
-    });
+    return `<svg viewBox="0 0 600 360" role="img" aria-label="Renkli bir bahçe ve ev resmi">
+      <rect width="600" height="360" fill="${sky}"/>
+      <circle cx="${alternate ? 95 : 80}" cy="75" r="${alternate ? 31 : 25}" fill="${sunColor}"/>
+      ${cloud}
+      <rect y="245" width="600" height="115" fill="${ground}"/>
+      <path d="M0 280 Q130 245 250 280 T600 270 V360 H0Z" fill="#6eaa62" opacity=".45"/>
+      <rect x="205" y="155" width="145" height="112" rx="3" fill="#f4e2bd" stroke="#8c7354" stroke-width="4"/>
+      <path d="M188 160 L278 95 L367 160Z" fill="#b65b45" stroke="#804538" stroke-width="4"/>
+      <rect x="264" y="205" width="34" height="62" fill="${doorColor}" stroke="#70452f" stroke-width="3"/>
+      <circle cx="291" cy="238" r="3" fill="#f7df8b"/>
+      <rect x="220" y="180" width="28" height="27" fill="#a9dcf5" stroke="#806c55" stroke-width="3"/>
+      <path d="M234 180 V207 M220 193 H248" stroke="#806c55" stroke-width="2"/>
+      <rect x="448" y="205" width="20" height="65" fill="#805333"/>
+      <circle cx="458" cy="172" r="42" fill="#36834a"/>
+      <circle cx="430" cy="190" r="28" fill="#459b55"/>
+      <circle cx="486" cy="194" r="30" fill="#3d914e"/>
+      ${treeFruit}
+      <path d="M145 310 V275" stroke="#347b3c" stroke-width="5"/>
+      <circle cx="145" cy="269" r="13" fill="${flowerColor}"/>
+      <circle cx="145" cy="269" r="5" fill="#f5d547"/>
+      <path d="M110 320 Q120 295 130 320 M160 320 Q170 295 180 320" fill="none" stroke="#347b3c" stroke-width="4"/>
+      <path d="M70 245 Q85 225 100 245 M520 250 Q535 230 550 250" fill="none" stroke="#347b3c" stroke-width="4"/>
+    </svg>`;
 }
 
-/* TOP VE ÇİZGİYİ EŞLEŞTİR */
-function matchBall(color, target) {
-    if (target.classList.contains("matched")) return;
+/* HER LİSTE SONRASI FARK BULMA OYUNU */
+function startDifferenceGame() {
+    showScreen("differenceScreen");
 
-    if (target.dataset.color === color) {
-        const balls = document.querySelectorAll(".color-ball");
-        let correctBall = null;
+    foundDifferences = new Set();
+    differenceClicks = 0;
 
-        balls.forEach(function(ball) {
-            if (ball.dataset.color === color &&
-                !ball.classList.contains("matched")) {
-                correctBall = ball;
-            }
+    document.getElementById("imageA").innerHTML =
+        makeScene(currentList, false);
+
+    const imageB = document.getElementById("imageB");
+    imageB.innerHTML = makeScene(currentList, true);
+
+    // Tıklanabilir bölgeler: güneş, bulut, kapı, ağaç ve çiçek
+    const targets = [
+        {id: 0, x: 14, y: 21, label: "Güneş"},
+        {id: 1, x: 73, y: 23, label: "Bulut"},
+        {id: 2, x: 47, y: 66, label: "Kapı"},
+        {id: 3, x: 77, y: 57, label: "Ağaç"},
+        {id: 4, x: 24, y: 77, label: "Çiçek"}
+    ];
+
+    targets.forEach(target => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "difference-hotspot";
+        button.style.left = target.x + "%";
+        button.style.top = target.y + "%";
+        button.setAttribute("aria-label", target.label + " farkı");
+        button.addEventListener("click", () => markDifference(target.id, button));
+        imageB.appendChild(button);
+    });
+
+    document.getElementById("differenceStatus").textContent =
+        "Bulunan fark: 0 / 5";
+
+    // Süre yalnızca arka planda ölçülür.
+    differenceStartTime = performance.now();
+}
+
+/* BULUNAN FARKI KAYDET */
+function markDifference(id, button) {
+    if (foundDifferences.has(id)) return;
+
+    differenceClicks++;
+    foundDifferences.add(id);
+    button.classList.add("found");
+
+    document.getElementById("differenceStatus").textContent =
+        "Bulunan fark: " + foundDifferences.size + " / 5";
+
+    if (foundDifferences.size === 5) {
+        const durationMs = performance.now() - differenceStartTime;
+
+        differenceResults.push({
+            participant: participantCode,
+            list: currentList + 1,
+            differencesFound: 5,
+            clicks: differenceClicks,
+            durationMs: Number(durationMs.toFixed(2)),
+            durationSeconds: Number((durationMs / 1000).toFixed(2))
         });
 
-        if (!correctBall) return;
+        document.getElementById("differenceStatus").textContent =
+            "Tüm farkları buldunuz. Tanıma testi başlıyor...";
 
-        correctBall.classList.add("matched");
-        target.classList.add("matched");
-        matchedCount++;
-        selectedBall = null;
-
-        document.querySelectorAll(".color-ball")
-            .forEach(b => b.classList.remove("selected"));
-
-        if (matchedCount === 3) {
-            document.getElementById("matchMessage").textContent =
-                "Eşleştirme tamamlandı!";
-
-            setTimeout(function() {
-                startTest();
-            }, 700);
-        }
-    } else {
-        target.classList.add("wrong");
-
-        setTimeout(function() {
-            target.classList.remove("wrong");
-        }, 400);
+        setTimeout(startTest, 1200);
     }
 }
 
 /* TESTİ BAŞLAT */
 function startTest() {
     showScreen("testScreen");
+
     currentTest = [...tests[currentList]];
     currentTest.sort(() => Math.random() - 0.5);
     currentTestIndex = 0;
+
     showTestWord();
 }
 
@@ -666,9 +739,11 @@ function finishList() {
 /* 30 SANİYELİK LİSTELER ARASI BEKLEME */
 function startCountdown(message, callback) {
     showScreen("waitingScreen");
+
     document.getElementById("waitingMessage").textContent = message;
 
     let remaining = 30;
+
     const timerNumber = document.getElementById("timerNumber");
     const timerProgress = document.getElementById("timerProgress");
     const circumference = 2 * Math.PI * 65;
@@ -717,9 +792,41 @@ function downloadResults() {
         "Deney Sonuçları"
     );
 
+    // FARK BULMA OYUNU SÜRELERİ
+    const gameRows = differenceResults.map(row => ({
+        "Katılımcı": row.participant,
+        "Liste": row.list,
+        "Bulunan Fark": row.differencesFound,
+        "Tıklama Sayısı": row.clicks,
+        "Oyun Süresi (saniye)": row.durationSeconds,
+        "Oyun Süresi (ms)": row.durationMs
+    }));
+
+    const gameWorksheet = XLSX.utils.json_to_sheet(gameRows);
+
+    gameWorksheet["!cols"] = [
+        { wch: 15 },
+        { wch: 10 },
+        { wch: 15 },
+        { wch: 16 },
+        { wch: 22 },
+        { wch: 20 }
+    ];
+
+    XLSX.utils.book_append_sheet(
+        workbook,
+        gameWorksheet,
+        "Fark Bulma Süreleri"
+    );
+
     worksheet["!cols"] = [
-        { wch: 15 }, { wch: 10 }, { wch: 20 }, { wch: 23 },
-        { wch: 20 }, { wch: 15 }, { wch: 20 }
+        { wch: 15 },
+        { wch: 10 },
+        { wch: 20 },
+        { wch: 23 },
+        { wch: 20 },
+        { wch: 15 },
+        { wch: 20 }
     ];
 
     XLSX.writeFile(
